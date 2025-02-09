@@ -66,4 +66,8 @@ class PostgreSQLContext:
             "./src/db/teht4.csv"
         )
         qry = f"INSERT INTO gender (gender) VALUES"
-        self.insert_values(qry, genders)
+        # self.insert_values(qry, genders)
+        qry = f"INSERT INTO job_title (title) VALUES"
+        self.insert_values(qry, jobTitles)
+        qry = f"INSERT INTO education_level (level) VALUES"
+        self.insert_values(qry, educationLevels)
