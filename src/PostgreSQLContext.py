@@ -59,6 +59,18 @@ class PostgreSQLContext:
         except Exception as e:
             print(e)
 
+    def fetch_employees(self):
+        qry = f"SELECT g.gender, jt.title, el.level, e.salary, e.age, e.years_of_experience \
+                FROM employee e \
+                JOIN education_level el ON e.education_level_id = el.id \
+                JOIN gender g ON e.gender_id = g.id \
+                JOIN job_title jt ON e.job_title_id = jt.id \
+                ORDER BY g.gender, el.level;"
+        with self.connect() as conn:
+            cur = conn.cursor()
+            cur.execute(qry)
+            return cur.fetchall()
+
     def insert_employees(self, employees):
         try:
             qry = ""
@@ -76,14 +88,28 @@ class PostgreSQLContext:
         except Exception as e:
             print(e)
 
+    def clear_tables(self):
+        try:
+            qry = f"DELETE FROM employee; \
+              DELETE FROM gender; \
+                DELETE FROM job_title; \
+                  DELETE FROM education_level; "
+            with self.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(qry)
+                conn.commit()
+        except Exception as e:
+            print(e)
+
     def handle_process(self):
         (employees, genders, jobTitles, educationLevels) = self.read_data(
             "./src/db/teht4.csv"
         )
+        self.clear_tables()
         qry = f"INSERT INTO gender (gender) VALUES"
-        # self.insert_values(qry, genders)
+        self.insert_values(qry, genders)
         qry = f"INSERT INTO job_title (title) VALUES"
-        # self.insert_values(qry, jobTitles)
+        self.insert_values(qry, jobTitles)
         qry = f"INSERT INTO education_level (level) VALUES"
-        # self.insert_values(qry, educationLevels)
+        self.insert_values(qry, educationLevels)
         self.insert_employees(employees)
