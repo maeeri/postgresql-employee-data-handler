@@ -18,8 +18,6 @@ class PostgreSQLContext:
                 port="5432",
             )
             yield conn
-        except Exception as e:
-            print(e)
         finally:
             if conn is not None:
                 conn.close()
@@ -58,16 +56,34 @@ class PostgreSQLContext:
                 cursor = conn.cursor()
                 cursor.execute(qry)
                 conn.commit()
-        except:
-            print("Something went wrong with inserting values")
+        except Exception as e:
+            print(e)
+
+    def insert_employees(self, employees):
+        try:
+            qry = ""
+            for e in employees:
+                qry += f"INSERT INTO employee (salary, age, years_of_experience, gender_id, education_level_id, job_title_id) \
+                  SELECT {e.salary}, {e.age}, {e.yearsOfExperience}, g.id, el.id, jt.id \
+                    FROM gender g, education_level el, job_title jt \
+                      WHERE g.gender = '{e.gender}' \
+                        AND el.level = '{e.educationLevel}' \
+                          AND jt.title = '{e.jobTitle}'; "
+            with self.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(qry)
+                conn.commit()
+        except Exception as e:
+            print(e)
 
     def handle_process(self):
-        (people, genders, jobTitles, educationLevels) = self.read_data(
+        (employees, genders, jobTitles, educationLevels) = self.read_data(
             "./src/db/teht4.csv"
         )
         qry = f"INSERT INTO gender (gender) VALUES"
         # self.insert_values(qry, genders)
         qry = f"INSERT INTO job_title (title) VALUES"
-        self.insert_values(qry, jobTitles)
+        # self.insert_values(qry, jobTitles)
         qry = f"INSERT INTO education_level (level) VALUES"
-        self.insert_values(qry, educationLevels)
+        # self.insert_values(qry, educationLevels)
+        self.insert_employees(employees)
