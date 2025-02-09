@@ -11,13 +11,15 @@ class PostgreSQLContext:
         try:
             # replace with relevant info when testing
             conn = psycopg2.connect(
-                database="EmployeesDb",
+                database="employeesdb",
                 user="app_user",
                 password="qwerty",
                 host="localhost",
                 port="5432",
             )
             yield conn
+        except Exception as e:
+            print(e)
         finally:
             if conn is not None:
                 conn.close()
@@ -45,3 +47,23 @@ class PostgreSQLContext:
         jobTitles = set(jobTitles)
         educationLevels = set(educationLevels)
         return (people, genders, jobTitles, educationLevels)
+
+    def insert_values(self, qry, valueList):
+        try:
+            queryParts = [qry]
+            for value in valueList:
+                queryParts.append(f"('{value}'), ")
+            qry = "".join(queryParts)[:-2] + ";"
+            with self.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(qry)
+                conn.commit()
+        except:
+            print("Something went wrong with inserting values")
+
+    def handle_process(self):
+        (people, genders, jobTitles, educationLevels) = self.read_data(
+            "./src/db/teht4.csv"
+        )
+        qry = f"INSERT INTO gender (gender) VALUES"
+        self.insert_values(qry, genders)

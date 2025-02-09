@@ -315,7 +315,8 @@ ALTER TABLE ONLY public.employee
 
 
 CREATE USER app_user WITH PASSWORD 'qwerty';
-GRANT SELECT, INSERT, DELETE, UPDATE ON ALL TABLES IN SCHEMA public TO app_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_user;
+GRANT USAGE, SELECT, INSERT, DELETE, UPDATE ON ALL TABLES IN SCHEMA public TO app_user;
 
 --
 -- PostgreSQL database dump complete
